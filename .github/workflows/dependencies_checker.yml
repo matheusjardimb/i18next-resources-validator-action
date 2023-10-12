@@ -1,0 +1,17 @@
+name: Check for dependencies without specific version
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+
+jobs:
+  dependency_check_job:
+    runs-on: ubuntu-latest
+    name: Check for dependencies without specific version
+    steps:
+      - uses: actions/checkout@v4.1.0
+      - uses: matheusjardimb/dependencies-checker@latest
