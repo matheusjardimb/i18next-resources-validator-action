@@ -1,21 +1,24 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
-  "version": "0.0.0",
-  "author": "",
-  "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "name": "i18next-resources-validator",
+  "description": "GitHub Action for validating i18next resources",
+  "version": "0.0.1",
+  "author": {
+    "name": "Matheus Jardim Bernardes",
+    "url": "https://matheusjardimb.com/"
+  },
+  "private": false,
+  "homepage": "https://github.com/matheusjardimb/i18next-resources-validator-action",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/matheusjardimb/i18next-resources-validator-action.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/matheusjardimb/i18next-resources-validator-action/issues"
   },
   "keywords": [
     "actions",
     "node",
-    "setup"
+    "i18next"
   ],
   "exports": {
     ".": "./dist/index.js"
@@ -85,5 +88,6 @@
     "prettier-eslint": "15.0.1",
     "ts-jest": "29.1.1",
     "typescript": "5.2.2"
-  }
+  },
+  "bin": "./dist/index.js"
 }
