@@ -1,25 +1,27 @@
 {
   "name": "i18next-resources-validator",
+  "version": "0.0.3",
   "description": "GitHub Action for validating i18next resources",
-  "version": "0.0.1",
-  "author": {
-    "name": "Matheus Jardim Bernardes",
-    "url": "https://matheusjardimb.com/"
-  },
   "private": false,
-  "homepage": "https://github.com/matheusjardimb/i18next-resources-validator-action",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/matheusjardimb/i18next-resources-validator-action.git"
-  },
-  "bugs": {
-    "url": "https://github.com/matheusjardimb/i18next-resources-validator-action/issues"
   },
   "keywords": [
     "actions",
     "node",
     "i18next"
   ],
+  "author": {
+    "name": "Matheus Jardim Bernardes",
+    "url": "https://matheusjardimb.com/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/matheusjardimb/i18next-resources-validator-action/issues"
+  },
+  "homepage": "https://github.com/matheusjardimb/i18next-resources-validator-action",
+  "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js"
   },
@@ -37,7 +39,6 @@
     "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg",
     "all": "npm run format:write && npm run lint && npm run test && npm run package"
   },
-  "license": "MIT",
   "jest": {
     "preset": "ts-jest",
     "verbose": true,

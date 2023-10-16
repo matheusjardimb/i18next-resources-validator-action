@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * Wait for a number of milliseconds.
  * @param milliseconds The number of milliseconds to wait.
