@@ -7,10 +7,9 @@ GitHub Action for validating i18next resources.
 
 ## Installation using npx
 
-```
+```bash
 npx i18next-resources-validator@latest
 ```
-
 
 ## Initial Setup
 
