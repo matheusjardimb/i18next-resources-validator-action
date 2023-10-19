@@ -1,18 +1,19 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'i18next resources validator'
+description: 'Validates localization resources for projects using i18next'
+author: 'Matheus Jardim Bernardes'
 
-# Define your inputs here.
+branding:
+  color: "green"
+  icon: "check-circle"
+
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  resourcesPath:
+    description: 'Complete path of the folder containing the json files to be evaluated'
     required: true
-    default: '1000'
-
-# Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
+  quiet:
+    description: 'Reduces the amount of logs printed during evaluation.'
+    required: false
+    default: false
 
 runs:
   using: node20
