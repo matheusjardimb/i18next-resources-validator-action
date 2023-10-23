@@ -12,9 +12,12 @@ function getQuietModeParam(): boolean {
 }
 
 function getResourcesPathParam(quietMode: boolean): string {
-  const resourcesPath = core.getInput(resourcesPathKey)
+  let resourcesPath = core.getInput(resourcesPathKey)
   if (!resourcesPath) {
     throw new MissingResourcesPathParamError()
+  }
+  if (!resourcesPath.endsWith('/')) {
+    resourcesPath = `${resourcesPath}/`
   }
   info(`Reading json files from '${resourcesPath}`, quietMode)
   return resourcesPath
