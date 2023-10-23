@@ -26005,17 +26005,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runChecker = void 0;
-const run_checker_1 = __importDefault(__nccwpck_require__(9734));
+const run_checker_1 = __nccwpck_require__(9734);
 const core = __importStar(__nccwpck_require__(2186));
 function runChecker() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            (0, run_checker_1.default)();
+            (0, run_checker_1.validateResources)();
         }
         catch (error) {
             core.error(error);
@@ -26102,6 +26099,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.validateResources = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const checkTranslations_1 = __importDefault(__nccwpck_require__(3679));
 const constants_1 = __nccwpck_require__(9042);
@@ -26124,7 +26122,7 @@ function validateResources() {
     const resourcesPath = getResourcesPathParam(quietMode);
     (0, checkTranslations_1.default)(resourcesPath, quietMode);
 }
-exports["default"] = validateResources;
+exports.validateResources = validateResources;
 
 
 /***/ }),

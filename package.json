@@ -39,7 +39,7 @@
     "package:watch": "npm run package -- --watch",
     "pre-commit.install": "husky install",
     "prepare": "husky install",
-    "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg"
+    "test": "jest && make-coverage-badge --output-path ./badges/coverage.svg"
   },
   "dependencies": {
     "@actions/core": "1.10.1",

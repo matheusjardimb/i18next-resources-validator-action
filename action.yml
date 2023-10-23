@@ -8,7 +8,7 @@ branding:
 
 inputs:
   resourcesPath:
-    description: 'Complete path of the folder containing the json files to be evaluated'
+    description: 'Complete path of the folder containing the valid_json_files files to be evaluated'
     required: true
   quiet:
     description: 'Reduces the amount of logs printed during evaluation.'

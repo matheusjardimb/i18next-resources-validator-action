@@ -46,14 +46,22 @@ function loadResources(validJson: ResourceDict, allTranslations: AllTranslations
   }
 }
 
-function checkLoadedResources(allTranslations: AllTranslations, allLanguages: AllLanguages): AllTranslations {
+function checkLoadedResources(allTranslations: AllTranslations, allLanguages: AllLanguages, quietMode: boolean): void {
   const result: AllTranslations = {}
   const allLanguagesArr = [...allLanguages]
 
+  let hasErrors = false
   for (const [translation, langs] of Object.entries(allTranslations)) {
-    result[translation] = allLanguagesArr.filter(item => !langs.includes(item))
+    const missingLangs = allLanguagesArr.filter(item => !langs.includes(item))
+    result[translation] = missingLangs
+    if (missingLangs.length !== 0) {
+      info(`Missing translations for ${translation} in '${missingLangs.join(', ')}'`, quietMode)
+      hasErrors = true
+    }
   }
-  return result
+  if (hasErrors) {
+    throw new MissingTranslationsError()
+  }
 }
 
 function checkResources(resourcesPath: string, quietMode: boolean): void {
@@ -69,17 +77,7 @@ function checkResources(resourcesPath: string, quietMode: boolean): void {
     const validJson = parseJsonFile(rawResourceFile, resourceFile)
     loadResources(validJson, allTranslations, allLanguages)
   }
-  const res = checkLoadedResources(allTranslations, allLanguages)
-  let hasErrors = false
-  for (const [str, missingLangs] of Object.entries(res)) {
-    if (missingLangs.length !== 0) {
-      info(`Missing ${missingLangs} for ${str}`, quietMode)
-      hasErrors = true
-    }
-  }
-  if (hasErrors) {
-    throw new MissingTranslationsError()
-  }
+  checkLoadedResources(allTranslations, allLanguages, quietMode)
 
   info('Finished validating without errors!', quietMode)
 }
