@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import validateResources from './run_checker'
+import { validateResources } from './run_checker'
 import * as core from '@actions/core'
 
 export async function runChecker(): Promise<void> {

@@ -26,4 +26,4 @@ function validateResources(): void {
   checkResources(resourcesPath, quietMode)
 }
 
-export default validateResources
+export { validateResources }
