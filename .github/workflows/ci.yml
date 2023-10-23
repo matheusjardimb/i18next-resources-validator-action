@@ -53,7 +53,7 @@ jobs:
         id: test-action
         uses: ./
         with:
-          milliseconds: 1000
+          resourcesPath: ''
 
       - name: Print Output
         id: output
