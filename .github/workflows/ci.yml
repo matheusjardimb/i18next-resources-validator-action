@@ -54,7 +54,4 @@ jobs:
         uses: ./
         with:
           resourcesPath: './valid_json_files'
-
-      - name: Print Output
-        id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+          quiet: 'false'
