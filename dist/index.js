@@ -26108,9 +26108,12 @@ function getQuietModeParam() {
     return quietMode === 'true';
 }
 function getResourcesPathParam(quietMode) {
-    const resourcesPath = core.getInput(constants_1.resourcesPathKey);
+    let resourcesPath = core.getInput(constants_1.resourcesPathKey);
     if (!resourcesPath) {
         throw new errors_1.MissingResourcesPathParamError();
+    }
+    if (!resourcesPath.endsWith('/')) {
+        resourcesPath = `${resourcesPath}/`;
     }
     (0, log_1.info)(`Reading json files from '${resourcesPath}`, quietMode);
     return resourcesPath;
