@@ -53,7 +53,7 @@ jobs:
         id: test-action
         uses: ./
         with:
-          resourcesPath: ''
+          resourcesPath: './valid_json_files'
 
       - name: Print Output
         id: output
