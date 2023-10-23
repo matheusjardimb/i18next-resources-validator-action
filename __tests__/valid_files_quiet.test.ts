@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals'
 import { getFilesFromFolder, setInput } from '../src/utils'
 import { quietModeKey, resourcesPathKey } from '../src/constants'
-import validateDependencies from '../src/run_checker'
+import validateResources from '../src/run_checker'
 import * as core from '@actions/core'
 
 describe('Test valid json files', () => {
@@ -12,7 +12,7 @@ describe('Test valid json files', () => {
         setInput(quietModeKey, 'true')
 
         const spy = jest.spyOn(core, 'info')
-        validateDependencies()
+        validateResources()
         expect(spy).not.toHaveBeenCalled()
       }).not.toThrow()
     })

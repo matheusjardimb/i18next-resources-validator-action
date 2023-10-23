@@ -1,4 +1,4 @@
-import core from '@actions/core'
+import * as core from '@actions/core'
 
 function info(msg: string, quietMode: boolean): void {
   if (!quietMode) {

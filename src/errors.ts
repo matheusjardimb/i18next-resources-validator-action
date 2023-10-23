@@ -1,4 +1,10 @@
-export class MissingResourcesPathParam extends Error {
+export class MissingTranslationsError extends Error {
+  constructor() {
+    super(`Missing translations found`)
+  }
+}
+
+export class MissingResourcesPathParamError extends Error {
   constructor() {
     super(`Resources path parameter is missing`)
   }

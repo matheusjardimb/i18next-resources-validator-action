@@ -1,7 +1,3 @@
-/**
- * Unit tests for src/wait.ts
- */
-
 import { wait } from '../src/wait'
 import { expect } from '@jest/globals'
 
