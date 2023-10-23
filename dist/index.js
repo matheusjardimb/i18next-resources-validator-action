@@ -25881,13 +25881,21 @@ function loadResources(validJson, allTranslations, allLanguages) {
         }
     }
 }
-function checkLoadedResources(allTranslations, allLanguages) {
+function checkLoadedResources(allTranslations, allLanguages, quietMode) {
     const result = {};
     const allLanguagesArr = [...allLanguages];
+    let hasErrors = false;
     for (const [translation, langs] of Object.entries(allTranslations)) {
-        result[translation] = allLanguagesArr.filter(item => !langs.includes(item));
+        const missingLangs = allLanguagesArr.filter(item => !langs.includes(item));
+        result[translation] = missingLangs;
+        if (missingLangs.length !== 0) {
+            (0, log_1.info)(`Missing translations for ${translation} in '${missingLangs.join(', ')}'`, quietMode);
+            hasErrors = true;
+        }
     }
-    return result;
+    if (hasErrors) {
+        throw new errors_1.MissingTranslationsError();
+    }
 }
 function checkResources(resourcesPath, quietMode) {
     (0, log_1.info)('Started validating resources', quietMode);
@@ -25900,17 +25908,7 @@ function checkResources(resourcesPath, quietMode) {
         const validJson = parseJsonFile(rawResourceFile, resourceFile);
         loadResources(validJson, allTranslations, allLanguages);
     }
-    const res = checkLoadedResources(allTranslations, allLanguages);
-    let hasErrors = false;
-    for (const [str, missingLangs] of Object.entries(res)) {
-        if (missingLangs.length !== 0) {
-            (0, log_1.info)(`Missing ${missingLangs} for ${str}`, quietMode);
-            hasErrors = true;
-        }
-    }
-    if (hasErrors) {
-        throw new errors_1.MissingTranslationsError();
-    }
+    checkLoadedResources(allTranslations, allLanguages, quietMode);
     (0, log_1.info)('Finished validating without errors!', quietMode);
 }
 exports["default"] = checkResources;
