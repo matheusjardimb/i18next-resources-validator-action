@@ -1,4 +1,4 @@
 const quietModeKey = 'quiet'
-const resourcesPathKey = 'resourcesPathKey'
+const resourcesPathKey = 'resourcesPath'
 
 export { quietModeKey, resourcesPathKey }

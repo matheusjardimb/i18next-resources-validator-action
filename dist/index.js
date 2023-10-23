@@ -25925,7 +25925,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resourcesPathKey = exports.quietModeKey = void 0;
 const quietModeKey = 'quiet';
 exports.quietModeKey = quietModeKey;
-const resourcesPathKey = 'resourcesPathKey';
+const resourcesPathKey = 'resourcesPath';
 exports.resourcesPathKey = resourcesPathKey;
 
 
