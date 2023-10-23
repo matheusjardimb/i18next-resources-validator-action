@@ -8,6 +8,7 @@
       "project": "./tsconfig.json"
     },
     "rules": {
+      "json/*": ["error", {"allowComments": true}],
       "import/no-commonjs": "off",
       "i18n-text/no-en": "off",
       "eslint-comments/no-use": "off",
