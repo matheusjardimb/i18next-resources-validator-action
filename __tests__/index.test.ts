@@ -2,10 +2,10 @@
  * Unit tests for the action's entrypoint, src/index.ts
  */
 
-import * as main from '../src/main'
+import * as main from '../src/run_checker'
 
 // Mock the action's entrypoint
-const runMock = jest.spyOn(main, 'run').mockImplementation()
+const runMock = jest.spyOn(main, 'validateResources').mockImplementation()
 
 describe('index', () => {
   it('calls run when imported', async () => {

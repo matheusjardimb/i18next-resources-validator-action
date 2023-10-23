@@ -1,9 +1,15 @@
 #!/usr/bin/env node
 
-/**
- * The entrypoint for the action.
- */
-import { run } from './main'
+import { validateResources } from './run_checker'
+import * as core from '@actions/core'
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
-run()
+export async function runChecker(): Promise<void> {
+  try {
+    validateResources()
+  } catch (error) {
+    core.error(error as Error)
+    core.setFailed(error as Error)
+  }
+}
+
+runChecker()

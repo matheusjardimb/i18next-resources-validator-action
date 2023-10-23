@@ -3257,6 +3257,241 @@ module.exports = parseParams
 
 /***/ }),
 
+/***/ 8981:
+/***/ ((module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _propertykey = __nccwpck_require__(2395);
+var _default = content => {
+  const contentType = typeof content;
+  if (contentType === 'string') {
+    if (isValidJSON(content)) {
+      return checkRedundancy(content);
+    } else {
+      throw new Error('Input is no valid JSON.');
+    }
+  } else {
+    throwInvalidContentTypeError(content, contentType);
+  }
+};
+exports["default"] = _default;
+const checkRedundancy = content => {
+  const formattedContent = initContent(content);
+  const allPropertyKeys = extractAllPropertyKeysOfContent(formattedContent);
+  const aggregatedPropertyKeys = [];
+  allPropertyKeys.forEach(propertyKey => {
+    (0, _propertykey.addPropertyKeyToArray)(aggregatedPropertyKeys, propertyKey);
+  });
+  return aggregatedPropertyKeys.filter(propertyKey => propertyKey.occurrence > 1);
+};
+const initContent = content => content.trim();
+const extractAllPropertyKeysOfContent = content => {
+  const parentStack = [(0, _propertykey.PropertyKey)('<instance>', null, false)];
+  for (let i = 0; i < content.length; i++) {
+    const currentChar = content.charAt(i);
+    if (currentChar === '{') {
+      return extractPropertyKeysOfObject(content, parentStack, i + 1).propertyKeys;
+    } else if (currentChar === '[') {
+      return extractPropertyKeysOfArray(content, parentStack, i + 1).propertyKeys;
+    }
+  }
+  return [];
+};
+const extractPropertyKeysOfObject = (content, parentStack, startIndex) => {
+  let currentPropertyKey;
+  let allPropertyKeys = [];
+  for (let i = startIndex; i < content.length; i++) {
+    const currentChar = content.charAt(i);
+    if (!isWhitespace(currentChar)) {
+      if (currentChar === '{' && currentPropertyKey !== undefined) {
+        parentStack.push(currentPropertyKey.propertyKey);
+        allPropertyKeys.push(currentPropertyKey.propertyKey);
+        const extractedPropertyKeys = extractPropertyKeysOfObject(content, parentStack, i + 1);
+        i = extractedPropertyKeys.newIndex;
+        allPropertyKeys = allPropertyKeys.concat(extractedPropertyKeys.propertyKeys);
+        currentPropertyKey = undefined;
+        parentStack.pop();
+      } else if (currentChar === '}') {
+        return {
+          propertyKeys: allPropertyKeys,
+          newIndex: i
+        };
+      } else if (currentChar === '[') {
+        parentStack.push(currentPropertyKey.propertyKey);
+        allPropertyKeys.push(currentPropertyKey.propertyKey);
+        const extractedPropertyKeys = extractPropertyKeysOfArray(content, parentStack, i + 1);
+        i = extractedPropertyKeys.newIndex;
+        allPropertyKeys = allPropertyKeys.concat(extractedPropertyKeys.propertyKeys);
+        currentPropertyKey = undefined;
+        parentStack.pop();
+      } else {
+        if (currentPropertyKey === undefined) {
+          currentPropertyKey = extractPropertyKey(content, parentStack, i);
+          i = currentPropertyKey.newIndex;
+        } else {
+          i = lastIndexOfPropertyValue(content, i);
+          allPropertyKeys.push(currentPropertyKey.propertyKey);
+          currentPropertyKey = undefined;
+        }
+      }
+    }
+  }
+};
+const extractPropertyKeysOfArray = (content, parentStack, startIndex) => {
+  let currentIndex = 0;
+  let currentKey = (0, _propertykey.PropertyKey)(`[${currentIndex}]`, parentStack[parentStack.length - 1], true);
+  parentStack.push(currentKey);
+  let allPropertyKeys = [];
+  for (let i = startIndex; i < content.length; i++) {
+    const currentChar = content.charAt(i);
+    if (!isWhitespace(currentChar)) {
+      if (currentChar === ',') {
+        parentStack.pop();
+        currentIndex++;
+        currentKey = (0, _propertykey.PropertyKey)(`[${currentIndex}]`, parentStack[parentStack.length - 1], true);
+        parentStack.push(currentKey);
+      } else if (currentChar === '{') {
+        const extractedPropertyKeys = extractPropertyKeysOfObject(content, parentStack, i + 1);
+        i = extractedPropertyKeys.newIndex;
+        allPropertyKeys = allPropertyKeys.concat(extractedPropertyKeys.propertyKeys);
+      } else if (currentChar === '[') {
+        const extractedPropertyKeys = extractPropertyKeysOfArray(content, parentStack, i + 1);
+        i = extractedPropertyKeys.newIndex;
+        allPropertyKeys = allPropertyKeys.concat(extractedPropertyKeys.propertyKeys);
+      } else if (currentChar === ']') {
+        parentStack.pop();
+        return {
+          propertyKeys: allPropertyKeys,
+          newIndex: i
+        };
+      } else {
+        i = lastIndexOfPropertyValue(content, i);
+        allPropertyKeys.push(parentStack[parentStack.length - 1]);
+      }
+    }
+  }
+};
+const extractPropertyKey = (content, parentStack, startIndex) => {
+  let quotationMarksFound = 0;
+  let isEscaped = false;
+  let startPropertyKeyIndex;
+  for (let i = startIndex; i < content.length; i++) {
+    const currentChar = content.charAt(i);
+    if (currentChar === '\\') {
+      isEscaped = !isEscaped;
+    } else {
+      if (isQuotationMark(currentChar, isEscaped)) {
+        quotationMarksFound++;
+        if (startPropertyKeyIndex === undefined) {
+          startPropertyKeyIndex = i;
+        }
+      } else {
+        if (quotationMarksFound === 2) {
+          if (currentChar === ':') {
+            return {
+              propertyKey: (0, _propertykey.PropertyKey)(formatKey(content.substring(startPropertyKeyIndex, i)), parentStack[parentStack.length - 1], false),
+              newIndex: i
+            };
+          }
+        }
+      }
+      isEscaped = false;
+    }
+  }
+};
+const lastIndexOfPropertyValue = (content, startIndex) => {
+  let evenAmountOfQuotationMarks = true;
+  let isEscaped = false;
+  for (let i = startIndex; i < content.length; i++) {
+    const currentChar = content.charAt(i);
+    if (currentChar === '\\') {
+      isEscaped = !isEscaped;
+    } else {
+      if (isQuotationMark(currentChar, isEscaped)) {
+        evenAmountOfQuotationMarks = !evenAmountOfQuotationMarks;
+      } else {
+        if ((currentChar === ',' || currentChar === '}' || currentChar === ']') && evenAmountOfQuotationMarks) {
+          return i - 1;
+        }
+        isEscaped = false;
+      }
+    }
+  }
+};
+const isWhitespace = currentChar => currentChar.trim() === '';
+const isQuotationMark = (currentChar, isEscaped) => currentChar === '"' && !isEscaped;
+const formatKey = unformattedKey => {
+  const trimmedKey = unformattedKey.trim();
+  if (trimmedKey.length > 1 && trimmedKey.startsWith('"') && trimmedKey.endsWith('"')) {
+    return trimmedKey.substring(1, trimmedKey.length - 1);
+  } else {
+    throw new Error(`Key ${unformattedKey} is not wrapped by "".`);
+  }
+};
+const isValidJSON = content => {
+  try {
+    JSON.parse(content);
+  } catch (err) {
+    return false;
+  }
+  return true;
+};
+const throwInvalidContentTypeError = (content, contentType) => {
+  if (content === null) {
+    throw new Error('Input may not be null.');
+  } else if (content === undefined) {
+    throw new Error('Input may not be undefined.');
+  } else {
+    throw new Error(`Input is of type ${contentType}, but not of type string.`);
+  }
+};
+module.exports = exports.default;
+
+/***/ }),
+
+/***/ 2395:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.addPropertyKeyToArray = exports.PropertyKey = void 0;
+const PropertyKey = (key, parent, isArray) => {
+  const PropertyKey = {
+    key,
+    parent,
+    occurrence: 1,
+    isArray,
+    propertyPath: () => PropertyKey.parent == null ? [PropertyKey.key] : parent.propertyPath().concat([PropertyKey.key]),
+    toString: () => PropertyKey.parent == null ? [PropertyKey.key] : `${PropertyKey.parent.toString()}${PropertyKey.isArray ? PropertyKey.key : `.${PropertyKey.key}`}`
+  };
+  return PropertyKey;
+};
+exports.PropertyKey = PropertyKey;
+const addPropertyKeyToArray = (propertyKeyArray, propertyKey) => {
+  const propertyKeysInArray = findPropertyKeysInArray(propertyKeyArray, propertyKey);
+  if (propertyKeysInArray.length === 0) {
+    propertyKeyArray.push(propertyKey);
+  } else if (propertyKeysInArray.length === 1) {
+    propertyKeysInArray[0].occurrence++;
+  } else {
+    throw new Error(`Property ${propertyKey.toString()} occurs multiple times in propertyKeys.`);
+  }
+};
+exports.addPropertyKeyToArray = addPropertyKeyToArray;
+const findPropertyKeysInArray = (propertyKeysArray, propertyKey) => propertyKeysArray.filter(propertyInArray => propertyInArray.parent === propertyKey.parent && propertyInArray.key === propertyKey.key);
+
+/***/ }),
+
 /***/ 4294:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -25596,7 +25831,200 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 399:
+/***/ 3679:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const errors_1 = __nccwpck_require__(6976);
+const fs_1 = __importDefault(__nccwpck_require__(7147));
+const find_duplicated_property_keys_1 = __importDefault(__nccwpck_require__(8981));
+const log_1 = __nccwpck_require__(5042);
+const utils_1 = __nccwpck_require__(1314);
+function readPackageJsonFileAsRaw(resourceFile) {
+    try {
+        return fs_1.default.readFileSync(resourceFile, 'utf8');
+    }
+    catch (e) {
+        throw new errors_1.InvalidResourceFileError(resourceFile);
+    }
+}
+function checkDuplicateEntries(rawJsonData) {
+    const result = (0, find_duplicated_property_keys_1.default)(rawJsonData);
+    if (result.length > 0) {
+        throw new errors_1.DuplicateTranslationEntryError(result[0]['key']);
+    }
+}
+function parseJsonFile(rawJsonFile, resourceFile) {
+    try {
+        return JSON.parse(rawJsonFile);
+    }
+    catch (e) {
+        throw new errors_1.InvalidResourceFileError(resourceFile);
+    }
+}
+function loadResources(validJson, allTranslations, allLanguages) {
+    for (const [language, translations] of Object.entries(validJson)) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for (const [key, value] of Object.entries(translations)) {
+            if (allTranslations[key] === undefined) {
+                allTranslations[key] = [language];
+            }
+            else {
+                allTranslations[key] = allTranslations[key].concat(language);
+            }
+            allLanguages.add(language);
+        }
+    }
+}
+function checkLoadedResources(allTranslations, allLanguages, quietMode) {
+    const result = {};
+    const allLanguagesArr = [...allLanguages];
+    let hasErrors = false;
+    for (const [translation, langs] of Object.entries(allTranslations)) {
+        const missingLangs = allLanguagesArr.filter(item => !langs.includes(item));
+        result[translation] = missingLangs;
+        if (missingLangs.length !== 0) {
+            (0, log_1.info)(`Missing translations for ${translation} in '${missingLangs.join(', ')}'`, quietMode);
+            hasErrors = true;
+        }
+    }
+    if (hasErrors) {
+        throw new errors_1.MissingTranslationsError();
+    }
+}
+function checkResources(resourcesPath, quietMode) {
+    (0, log_1.info)('Started validating resources', quietMode);
+    const allTranslations = {};
+    const allLanguages = new Set();
+    const resourceFiles = (0, utils_1.getFilesFromFolder)(resourcesPath);
+    for (const resourceFile of resourceFiles) {
+        const rawResourceFile = readPackageJsonFileAsRaw(resourceFile);
+        checkDuplicateEntries(rawResourceFile);
+        const validJson = parseJsonFile(rawResourceFile, resourceFile);
+        loadResources(validJson, allTranslations, allLanguages);
+    }
+    checkLoadedResources(allTranslations, allLanguages, quietMode);
+    (0, log_1.info)('Finished validating without errors!', quietMode);
+}
+exports["default"] = checkResources;
+
+
+/***/ }),
+
+/***/ 9042:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resourcesPathKey = exports.quietModeKey = void 0;
+const quietModeKey = 'quiet';
+exports.quietModeKey = quietModeKey;
+const resourcesPathKey = 'resourcesPath';
+exports.resourcesPathKey = resourcesPathKey;
+
+
+/***/ }),
+
+/***/ 6976:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DuplicateTranslationEntryError = exports.InvalidResourceFileError = exports.MissingResourcesPathParamError = exports.MissingTranslationsError = void 0;
+class MissingTranslationsError extends Error {
+    constructor() {
+        super(`Missing translations found`);
+    }
+}
+exports.MissingTranslationsError = MissingTranslationsError;
+class MissingResourcesPathParamError extends Error {
+    constructor() {
+        super(`Resources path parameter is missing`);
+    }
+}
+exports.MissingResourcesPathParamError = MissingResourcesPathParamError;
+class InvalidResourceFileError extends Error {
+    constructor(fileName) {
+        super(`Invalid file: '${fileName}'`);
+    }
+}
+exports.InvalidResourceFileError = InvalidResourceFileError;
+class DuplicateTranslationEntryError extends Error {
+    constructor(entry) {
+        super(`Duplicated translation entry found: '${entry}'`);
+    }
+}
+exports.DuplicateTranslationEntryError = DuplicateTranslationEntryError;
+
+
+/***/ }),
+
+/***/ 6144:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.runChecker = void 0;
+const run_checker_1 = __nccwpck_require__(9734);
+const core = __importStar(__nccwpck_require__(2186));
+function runChecker() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            (0, run_checker_1.validateResources)();
+        }
+        catch (error) {
+            core.error(error);
+            core.setFailed(error);
+        }
+    });
+}
+exports.runChecker = runChecker;
+runChecker();
+
+
+/***/ }),
+
+/***/ 5042:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -25625,57 +26053,104 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = void 0;
+exports.info = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const wait_1 = __nccwpck_require__(5259);
-/**
- * The main function for the action.
- * @returns {Promise<void>} Resolves when the action is complete.
- */
-async function run() {
-    try {
-        const ms = core.getInput('milliseconds');
-        // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-        core.debug(`Waiting ${ms} milliseconds ...`);
-        // Log the current timestamp, wait, then log the new timestamp
-        core.debug(new Date().toTimeString());
-        await (0, wait_1.wait)(parseInt(ms, 10));
-        core.debug(new Date().toTimeString());
-        // Set outputs for other workflow steps to use
-        core.setOutput('time', new Date().toTimeString());
-    }
-    catch (error) {
-        // Fail the workflow run if an error occurs
-        if (error instanceof Error)
-            core.setFailed(error.message);
+function info(msg, quietMode) {
+    if (!quietMode) {
+        core.info(msg);
     }
 }
-exports.run = run;
+exports.info = info;
 
 
 /***/ }),
 
-/***/ 5259:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 9734:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.wait = void 0;
-/**
- * Wait for a number of milliseconds.
- * @param milliseconds The number of milliseconds to wait.
- * @returns {Promise<string>} Resolves with 'done!' after the wait is over.
- */
-async function wait(milliseconds) {
-    return new Promise(resolve => {
-        if (isNaN(milliseconds)) {
-            throw new Error('milliseconds not a number');
-        }
-        setTimeout(() => resolve('done!'), milliseconds);
-    });
+exports.validateResources = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const checkTranslations_1 = __importDefault(__nccwpck_require__(3679));
+const constants_1 = __nccwpck_require__(9042);
+const log_1 = __nccwpck_require__(5042);
+const errors_1 = __nccwpck_require__(6976);
+function getQuietModeParam() {
+    const quietMode = core.getInput(constants_1.quietModeKey);
+    return quietMode === 'true';
 }
-exports.wait = wait;
+function getResourcesPathParam(quietMode) {
+    let resourcesPath = core.getInput(constants_1.resourcesPathKey);
+    if (!resourcesPath) {
+        throw new errors_1.MissingResourcesPathParamError();
+    }
+    if (!resourcesPath.endsWith('/')) {
+        resourcesPath = `${resourcesPath}/`;
+    }
+    (0, log_1.info)(`Reading json files from '${resourcesPath}`, quietMode);
+    return resourcesPath;
+}
+function validateResources() {
+    const quietMode = getQuietModeParam();
+    const resourcesPath = getResourcesPathParam(quietMode);
+    (0, checkTranslations_1.default)(resourcesPath, quietMode);
+}
+exports.validateResources = validateResources;
+
+
+/***/ }),
+
+/***/ 1314:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.setInput = exports.getFilesFromFolder = void 0;
+const fs_1 = __importDefault(__nccwpck_require__(7147));
+function getFilesFromFolder(directory, extension = '.json') {
+    return fs_1.default
+        .readdirSync(directory, { withFileTypes: true })
+        .filter(item => item.isFile())
+        .filter(item => item.name.endsWith(extension))
+        .map(item => `${directory}${item.name}`);
+}
+exports.getFilesFromFolder = getFilesFromFolder;
+const setInput = (name, value) => {
+    process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] = value;
+};
+exports.setInput = setInput;
 
 
 /***/ }),
@@ -25942,22 +26417,12 @@ module.exports = require("zlib");
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-var exports = __webpack_exports__;
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-/**
- * The entrypoint for the action.
- */
-const main_1 = __nccwpck_require__(399);
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
-(0, main_1.run)();
-
-})();
-
-module.exports = __webpack_exports__;
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6144);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;
