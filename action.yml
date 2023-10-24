@@ -7,7 +7,7 @@ branding:
   icon: "check-circle"
 
 inputs:
-  resourcesPath:
+  resources_path:
     description: 'Complete path of the folder containing the valid_json_files files to be evaluated'
     required: true
   quiet:
