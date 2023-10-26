@@ -53,5 +53,6 @@ jobs:
         id: test-action
         uses: ./
         with:
-          resources_path: ${{ github.workspace }}/.github/workflows/valid_json_files
+          resources_path:
+            ${{ github.workspace }}/.github/workflows/valid_json_files
           quiet: 'false'
