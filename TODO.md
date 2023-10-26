@@ -10,8 +10,3 @@
 - [ ] overwrite the original .json files, sorting translations
 - [ ] fail when an empty translation is found
 - [ ] check for translation params (using same var names in all languages)
-
-export INPUT_RESOURCES_PATH="$(pwd)/i18n/json"
-export INPUT_RESOURCES_PATH="${CI_PROJECT_DIR}/i18n/json"
-
-

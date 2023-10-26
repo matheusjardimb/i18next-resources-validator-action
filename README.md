@@ -8,6 +8,8 @@ GitHub Action for validating i18next resources.
 ## Installation using npx
 
 ```bash
+export INPUT_RESOURCES_PATH="$(pwd)/i18n/json"
+export INPUT_RESOURCES_PATH="${CI_PROJECT_DIR}/i18n/json"
 npx i18next-resources-validator@latest
 ```
 
