@@ -7,7 +7,6 @@ export async function runChecker(): Promise<void> {
   try {
     validateResources()
   } catch (error) {
-    core.error(error as Error)
     core.setFailed(error as Error)
   }
 }

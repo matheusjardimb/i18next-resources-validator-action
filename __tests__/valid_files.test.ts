@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { getFilesFromFolder, setInput } from '../src/utils'
+import { setInput } from '../src/utils'
 import { resourcesPathKey } from '../src/constants'
 import { validateResources } from '../src/run_checker'
 

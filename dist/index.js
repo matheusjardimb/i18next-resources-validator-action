@@ -25925,7 +25925,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resourcesPathKey = exports.quietModeKey = void 0;
 const quietModeKey = 'quiet';
 exports.quietModeKey = quietModeKey;
-const resourcesPathKey = 'resourcesPath';
+const resourcesPathKey = 'resources_path';
 exports.resourcesPathKey = resourcesPathKey;
 
 
@@ -26013,7 +26013,6 @@ function runChecker() {
             (0, run_checker_1.validateResources)();
         }
         catch (error) {
-            core.error(error);
             core.setFailed(error);
         }
     });

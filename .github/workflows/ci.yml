@@ -15,13 +15,13 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.0
 
       - name: Setup Node.js
         id: setup-node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.0.0
         with:
-          node-version: 18
+          node-version-file: '.nvmrc'
           cache: npm
 
       - name: Install Dependencies
@@ -47,11 +47,12 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.0
 
       - name: Test Local Action
         id: test-action
         uses: ./
         with:
-          resourcesPath: ${{ github.workspace }}/.github/workflows/valid_json_files
+          resources_path:
+            ${{ github.workspace }}/.github/workflows/valid_json_files
           quiet: 'false'
