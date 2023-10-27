@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Find merge conflicts
     steps:
-      - uses: actions/checkout@v4.1.0
+      - uses: actions/checkout@v4.1.1
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
