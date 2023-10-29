@@ -69,5 +69,3 @@ npx i18next-resources-validator@latest
 ## License
 
 See more about the MIT licensing at [LICENSE](LICENSE).
-
-
