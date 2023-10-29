@@ -1,14 +1,8 @@
-<<<<<<< HEAD
 # i18next Resource Validator Action
-=======
-# i18next-resources-validator-action
->>>>>>> readmeUpdate
 
 [![GitHub Super-Linter](https://github.com/actions/typescript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/actions/typescript-action/actions/workflows/ci.yml/badge.svg)
 
-<<<<<<< HEAD
-=======
 GitHub Action for validating i18next resources.
 
 ## Installation using npx
@@ -19,7 +13,6 @@ export INPUT_RESOURCES_PATH="${CI_PROJECT_DIR}/i18n/json"
 npx i18next-resources-validator@latest
 ```
 
->>>>>>> readmeUpdate
 ## Initial Setup
 
 > [!NOTE]

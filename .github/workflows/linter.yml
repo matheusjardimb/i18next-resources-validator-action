@@ -30,7 +30,6 @@ jobs:
           node-version-file: '.nvmrc'
           cache: npm
 
-
       - name: Install Dependencies
         id: install
         run: npm ci
