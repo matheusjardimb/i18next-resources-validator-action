@@ -13,5 +13,5 @@ jobs:
     runs-on: ubuntu-latest
     name: Check for dependencies without specific version
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
       - uses: matheusjardimb/dependencies-checker@latest
